@@ -1,0 +1,315 @@
+// Common class
+// Font size
+.font-size-1rem{
+    font-size: $size-1rem !important;
+}
+.font-size-1pt3rem{
+    font-size: $size-1pt3rem !important;
+}
+.font-size-1pt5rem{
+    font-size: $size-1pt5rem !important;
+}
+.font-size-2rem{
+    font-size: $size-2rem !important;
+    @include mediaQueries (mixin-max-medium) {
+        font-size: $size-1pt5rem !important;
+    }
+}
+.font-size-3rem{
+    font-size: $size-3rem !important;
+    @include mediaQueries (mixin-max-medium) {
+        font-size: $size-2rem !important;
+    }
+}
+.font-size-4rem{
+    font-size: $size-4rem !important;
+    @include mediaQueries (mixin-max-medium) {
+        font-size: $size-3rem !important;
+    }
+    @include mediaQueries (mixin-max-small) {
+        font-size: $size-3rem !important;
+    }
+}
+.font-size-5rem{
+    font-size: $size-5rem !important;
+    @include mediaQueries (mixin-max-medium) {
+        font-size: $size-4rem !important;
+    }
+    @include mediaQueries (mixin-max-small) {
+        font-size: $size-3rem !important;
+    }
+}
+.font-size-6rem{
+    font-size: $size-6rem !important;
+    @include mediaQueries (mixin-max-medium) {
+        font-size: $size-4rem !important;
+    }
+    @include mediaQueries (mixin-max-small) {
+        font-size: $size-3rem !important;
+    }
+}
+.font-size-7rem{
+    font-size: $size-7rem !important;
+    @include mediaQueries (mixin-max-medium) {
+        font-size: $size-5rem !important;
+    }
+    @include mediaQueries (mixin-max-small) {
+        font-size: $size-4rem !important;
+    }
+}
+.font-size-8rem{
+    font-size: $size-8rem !important;
+    @include mediaQueries (mixin-max-medium) {
+        font-size: $size-6rem !important;
+    }
+    @include mediaQueries (mixin-max-small) {
+        font-size: $size-5rem !important;
+    }
+}
+.font-size-9rem{
+    font-size: $size-9rem !important;
+    @include mediaQueries (mixin-max-medium) {
+        font-size: $size-7rem !important;
+    }
+    @include mediaQueries (mixin-max-small) {
+        font-size: $size-6rem !important;
+    }
+}
+.font-size-10rem{
+    font-size: $size-10rem !important;
+    @include mediaQueries (mixin-max-medium) {
+        font-size: $size-8rem !important;
+    }
+    @include mediaQueries (mixin-max-small) {
+        font-size: $size-7rem !important;
+    }
+}
+// Font family
+.font-family-fantasy{
+    font-family: $family-fantasy, $family-roboto, $family-sans-serif !important;
+}
+.font-family-architects-daughter{
+    font-family: $architects-daughter, $family-roboto, $family-sans-serif !important;
+}
+// Color
+.info{
+    color: $info !important;
+}
+.info-dark{
+    color: $info-dark !important;
+}
+.info-bg{
+    background: $info !important;
+}
+.info-dark-bg{
+    background: $info-dark !important;
+}
+
+.success{
+    color: $success !important;
+}
+.success-dark{
+    color: $success-dark !important;
+}
+.success-bg{
+    background: $success !important;
+}
+.success-dark-bg{
+    background: $success-dark !important;
+}
+
+.warning{
+    color: $warning !important;
+}
+.warning-dark{
+    color: $warning-dark !important;
+}
+.warning-bg{
+    background: $warning !important;
+}
+.warning-dark-bg{
+    background: $warning-dark !important;
+}
+
+.danger{
+    color: $danger !important;
+}
+.danger-dark{
+    color: $danger-dark !important;
+}
+.danger-bg{
+    background: $danger !important;
+}
+.danger-dark-bg{
+    background: $danger-dark !important;
+}
+
+.default{
+    color: $default !important;
+}
+.default-dark{
+    color: $default-dark !important;
+}
+.default-bg{
+    background: $default !important;
+}
+.default-dark-bg{
+    background: $default-dark !important;
+}
+
+.primary{
+    color: $primary !important;
+}
+.primary-dark{
+    color: $primary-dark !important;
+}
+.primary-bg{
+    background: $primary !important;
+}
+.primary-dark-bg{
+    background: $primary-dark !important;
+}
+
+.secondary{
+    color: $secondary !important;
+}
+.secondary-dark{
+    color: $secondary-dark !important;
+}
+.secondary-bg{
+    background: $secondary !important;
+}
+.secondary-dark-bg{
+    background: $secondary-dark !important;
+}
+
+.blue-whale {
+    color: $blue-whale !important;
+}
+.blue-whale-bg {
+    background-color: $blue-whale !important;
+}
+.ice {
+    color: $ice !important;
+}
+.ice-bg {
+    background-color: $ice !important;
+}
+.unique-color-bg{
+    background-color: $unique-color !important;
+}
+.very-light-gray-bg{
+    background-color: $very-light-gray !important;
+}
+.pale-turquoise-bg{
+    background-color: $pale-turquoise !important;
+}
+
+// Overflow
+.overflow-hidden{
+    overflow: hidden !important;
+}
+.overflow-visible{
+    overflow: visible !important;
+}
+.overflow-auto{
+    overflow: auto !important;
+}
+.overflow-x-hidden{
+	overflow-x: hidden;
+}
+.overflow-y-hidden{
+	overflow-y: hidden;
+}
+.overflow-x-auto{
+	overflow-x: auto;
+}
+.overflow-y-auto{
+	overflow-y: auto;
+}
+// Visibility
+.visibility-hidden{
+    visibility: hidden !important;
+}
+.visibility-visible{
+    visibility: visible !important;
+}
+
+.v-align-top {
+  vertical-align: top !important;
+}
+.v-align-middle {
+  vertical-align: middle !important;
+}
+.v-align-bottom {
+  vertical-align: bottom !important;
+}
+.v-align-base {
+  vertical-align: baseline !important;
+}
+
+.cursor-default{
+    cursor: default !important;
+}
+.cursor-pointer{
+    cursor: pointer !important;
+}
+.cursor-not-allowed{
+    cursor: not-allowed !important;
+    pointer-events: auto !important;
+}
+.cursor-not-allowed-event-none{
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    scroll-behavior: smooth;
+    font-family: $family-roboto, $family-sans-serif !important;
+    background-color: $overcast;
+    color: $blue-whale;
+}
+
+body, #root{
+    overflow-x: hidden;
+}
+
+// Snackbar Notification
+.snackbar-content {
+    visibility: visible;
+    right: 20px;
+    top: 75px;
+    color: $white !important;
+    &.default {
+        background-color: $default !important;
+        &:hover {
+            background-color: $default-dark !important;
+        }
+    }
+    &.info {
+        background-color: $info !important;
+        &:hover {
+            background-color: $info-dark !important;
+        }
+    }
+    &.success {
+        background-color: $success !important;
+        &:hover {
+            background-color: $success-dark !important;
+        }
+    }
+    &.error {
+        background-color: $danger !important;
+        &:hover {
+            background-color: $danger-dark !important;
+        }
+    }
+    &.warning {
+        background-color: $warning !important;
+        &:hover {
+            background-color: $warning-dark !important;
+        }
+    }
+}
