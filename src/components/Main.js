@@ -41,8 +41,9 @@ class Main extends React.Component {
     }
 
     UNSAFE_componentWillMount() {
+        const auth = this.getCookie("authenticate")
         this.setState({
-            isAuthenticated: this.getCookie("authenticate")
+            isAuthenticated: auth !== "" ? auth : "false"
         })
     }
 
@@ -69,7 +70,7 @@ class Main extends React.Component {
             <React.Fragment>
                 <MDBBox tag="div" className="exam-app">
                     <Router>
-                        { isAuthenticated ? <Header /> : "" }
+                        { isAuthenticated === "true" ? <Header name={this.getCookie("MName")} /> : "" }
                             {/* Body */}
                             <Switch >
                                 {
@@ -80,9 +81,9 @@ class Main extends React.Component {
                                                     <MDBBox tag="main">
                                                         {
                                                             items.wrapper !== "login" ?
-                                                                isAuthenticated ? items.render : <Redirect to="/login" />
+                                                                isAuthenticated === "true" ? items.render : <Redirect to="/login" />
                                                             :
-                                                                !isAuthenticated ? items.render : <Redirect to="/dashboard" />
+                                                                isAuthenticated === "false" ? items.render : <Redirect to="/dashboard" />
                                                         }
                                                     </MDBBox>
                                                 )
@@ -92,7 +93,7 @@ class Main extends React.Component {
                                 }
                             </Switch>
                             {/* Body */}
-                        { isAuthenticated ? <Footer /> : "" }
+                        { isAuthenticated === "true" ? <Footer /> : "" }
                     </Router>
                 </MDBBox>
             </React.Fragment>
