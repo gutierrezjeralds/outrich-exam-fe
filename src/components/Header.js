@@ -54,6 +54,7 @@ class Header extends Component {
                                         <MDBBox tag="span" className="nav-usr-name">{this.props.name}</MDBBox>
                                     </MDBDropdownToggle>
                                     <MDBDropdownMenu className="dropdown-default">
+                                        <MDBDropdownItem href="/edit-profile" className="px-4">Edit Profile</MDBDropdownItem>
                                         <MDBDropdownItem onClick={this.handleLogout.bind()}>Logout</MDBDropdownItem>
                                     </MDBDropdownMenu>
                                 </MDBDropdown>

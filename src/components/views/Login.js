@@ -193,7 +193,7 @@ class Login extends React.Component {
             return (
                 <button type="submit" className="btn btn-default">
                     <MDBIcon icon="paper-plane" className="mr-2" />
-                    Submit
+                    Login
                 </button>
             )
         }

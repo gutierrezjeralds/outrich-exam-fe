@@ -3,6 +3,7 @@ import Header from './Header'
 import Footer from './Footer'
 import Login from './views/Login'
 import Dashboard from './views/Dashboard'
+import EditProfile from './views/Edit-Profile'
 import { MDBBox } from 'mdbreact'
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 
@@ -29,6 +30,12 @@ class Main extends React.Component {
                     render: <Dashboard />,
                     wrapper: "dashboard",
                     path: "/dashboard"
+                },
+                {
+                    id: 3,
+                    render: <EditProfile />,
+                    wrapper: "edit-profile",
+                    path: "/edit-profile"
                 }
                 // {
                 //     id: 0,
