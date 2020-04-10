@@ -101,7 +101,18 @@ class Login extends React.Component {
         })
         .then(
             (result) => {
-                if ( result.response === "success" ) {
+                if ( result.response === "fail" ) {
+                    this.setState({
+                        in_submit: false,
+                        err_unexpected: true
+                    })
+                } else if ( result.response === "incorrect" || result.response === "no-data" ) {
+                    this.setState({
+                        in_submit: false,
+                        err_incorrect: true
+                    })
+                } else {
+                    // Success
                     this.setState({
                         isNotif: true,
                         notifCat: "success",
@@ -109,24 +120,15 @@ class Login extends React.Component {
                     })
     
                     this.setCookie("authenticate", true, 1)
+                    this.setCookie("MName", result.response.name, 1)
+                    this.setCookie("MTrack", result.response.id, 1)
+                    this.setCookie("MRole", result.response.role, 1)
     
                     setTimeout(
                         function() {
                             window.location.href = "/dashboard"
                         } , 100
                     )
-
-                } else if ( result.response === "incorrect" || result.response === "no-data" ) {
-                    this.setState({
-                        in_submit: false,
-                        err_incorrect: true
-                    })
-
-                } else {
-                    this.setState({
-                        in_submit: false,
-                        err_unexpected: true
-                    })
                 }
             },
             // Note: it's important to handle errors here
