@@ -1,15 +1,33 @@
 import React, { Component } from "react";
 import {
-    MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavbarToggler, MDBCollapse
+    MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavbarToggler, MDBNavItem, MDBCollapse, MDBDropdown,
+    MDBDropdownToggle, MDBDropdownMenu, MDBDropdownItem, MDBBox
 } from "mdbreact";
 
 class Header extends Component {
-    state = {
-        isOpen: false
-    };
-
+    constructor(props) {
+        super(props)
+        this.state = {
+            isOpen: false
+        }
+    }
+    
     toggleCollapse = () => {
         this.setState({ isOpen: !this.state.isOpen });
+    }
+
+    handleLogout() {
+        //Set authenticate to false
+        var d = new Date();
+        d.setTime(d.getTime() + (1*24*60*60*1000));
+        var expires = "expires="+ d.toUTCString();
+        document.cookie = "authenticate=false;" + expires + ";path=/";
+
+        setTimeout(
+            function() {
+                window.location.href = "/login"
+            } , 100
+        )
     }
 
     render() {
@@ -27,6 +45,18 @@ class Header extends Component {
                         <li className="nav-item active">
                             <a className="nav-link waves-effect waves-light" href="/dashboard">Dashboard</a>
                         </li>
+                    </MDBNavbarNav>
+                    <MDBNavbarNav right>
+                        <MDBNavItem>
+                            <MDBDropdown>
+                                <MDBDropdownToggle nav caret>
+                                    <MDBBox tag="span" className="nav-usr-name">{this.props.name}</MDBBox>
+                                </MDBDropdownToggle>
+                                <MDBDropdownMenu className="dropdown-default">
+                                    <MDBDropdownItem onClick={this.handleLogout.bind()}>Logout</MDBDropdownItem>
+                                </MDBDropdownMenu>
+                            </MDBDropdown>
+                        </MDBNavItem>
                     </MDBNavbarNav>
                 </MDBCollapse>
             </MDBNavbar>
