@@ -85,7 +85,7 @@ class Main extends React.Component {
                                         <Route exact path={items.path} key={items.id}
                                             render = {
                                                 () => (
-                                                    <MDBBox tag="main">
+                                                    <MDBBox tag="main" className="py-5">
                                                         {
                                                             items.wrapper !== "login" ?
                                                                 isAuthenticated === "true" ? items.render : <Redirect to="/login" />

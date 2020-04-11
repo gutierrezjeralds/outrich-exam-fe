@@ -32,7 +32,7 @@ class Header extends Component {
 
     render() {
         return (
-            <MDBNavbar color="indigo" dark expand="md">
+            <MDBNavbar color="indigo" dark expand="md" fixed="top">
                 <MDBContainer>
                     <MDBNavbarBrand>
                         <strong className="white-text">Navbar</strong>
