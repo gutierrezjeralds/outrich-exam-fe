@@ -121,6 +121,7 @@ class Login extends React.Component {
     
                     this.setCookie("authenticate", true, 1)
                     this.setCookie("MName", result.response.name, 1)
+                    this.setCookie("MEmail", result.response.email, 1)
                     this.setCookie("MTrack", result.response.id, 1)
                     this.setCookie("MRole", result.response.role, 1)
     
