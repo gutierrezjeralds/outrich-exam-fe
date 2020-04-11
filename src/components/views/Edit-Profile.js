@@ -7,6 +7,8 @@ class EditProfile extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+            isLoaded: false,
+            isHideLoadingStr: false,
             in_name: "",
             in_password: "",
             in_submit: false,
@@ -103,6 +105,8 @@ class EditProfile extends React.Component {
         }
 
         this.setState({
+            isLoaded: false,
+            isHideLoadingStr: true,
             in_submit: true,
             isNotif: false,
         })
@@ -130,6 +134,8 @@ class EditProfile extends React.Component {
                     )
                 } else {
                     this.setState({
+                        isLoaded: true,
+                        isHideLoadingStr: false,
                         in_submit: false,
                         err_unexpected: true
                     })
@@ -141,6 +147,8 @@ class EditProfile extends React.Component {
             (error) => {
                 // Handle errors here
                 this.setState({
+                    isLoaded: true,
+                    isHideLoadingStr: false,
                     in_submit: false,
                     isNotif: true,
                     notifCat: "error",
@@ -154,6 +162,8 @@ class EditProfile extends React.Component {
             (err) => {
                 // Handle errors here
                 this.setState({
+                    isLoaded: true,
+                    isHideLoadingStr: false,
                     in_submit: false,
                     isNotif: true,
                     notifCat: "error",
@@ -194,8 +204,14 @@ class EditProfile extends React.Component {
                         // Loading
                         <MDBBox tag="div" className="loader-section">
                             <MDBBox tag="div" className="position-fixed z-index-9999 l-0 t-0 r-0 b-0 m-auto overflow-visible flex-center">
-                                <MDBBox tag="span" className="loader-spin-dual-ring"></MDBBox>
-                                <MDBBox tag="span" className="ml-2 font-size-1rem white-text">Loading, please wait...</MDBBox>
+                                {
+                                    !this.state.isHideLoadingStr ? (
+                                        <React.Fragment>
+                                            <MDBBox tag="span" className="loader-spin-dual-ring"></MDBBox>
+                                            <MDBBox tag="span" className="ml-2 font-size-1rem white-text">Loading, please wait...</MDBBox>
+                                        </React.Fragment>
+                                    ) : ("")
+                                }
                             </MDBBox>
                             <MDBBox tag="div" className="loader-backdrop position-fixed z-index-1040 l-0 t-0 r-0 b-0 black"></MDBBox>
                         </MDBBox>
