@@ -332,7 +332,7 @@ class Dashboard extends React.Component {
                 })
 
                 // Conditional alert message
-                if ( result.response ) {
+                if ( result.response === true || result.response === "true" ) {
                     if ( this.state.in_method === "add" ) {
                         this.setState({
                             notifCat: "success",
@@ -365,11 +365,17 @@ class Dashboard extends React.Component {
                             notifStr: "Something went wrong!",
                         })
                     }
-                } else if ( !result.response ) {
+                } else if ( result.response === false || result.response === "false" ) {
                     this.setState({
                         in_submit: false,
                         notifCat: "warning",
                         notifStr: "Something went wrong!",
+                    })
+                } else if ( result.response === "duplicate" ) {
+                    this.setState({
+                        in_submit: false,
+                        notifCat: "warning",
+                        notifStr: "Duplicate record!",
                     })
                 } else {
                     this.setState({
