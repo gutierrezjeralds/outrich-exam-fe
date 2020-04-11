@@ -3,31 +3,42 @@ import Snackbar from "../views/includes/Snackbar"
 import Pagination from "../views/includes/Pagination"
 import $ from 'jquery'
 import { 
-    MDBContainer, MDBRow, MDBCol, MDBBox, MDBBtn,
+    MDBContainer, MDBRow, MDBCol, MDBBox, MDBInput,
     MDBTable, MDBTableBody, MDBTableHead,
-    MDBModal, MDBModalBody, MDBModalHeader, MDBModalFooter, MDBIcon
+    MDBModalBody, MDBModalFooter, MDBIcon
 } from "mdbreact";
+import Modal from 'react-bootstrap/Modal'
 
 class Dashboard extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
             isLoaded: false,
+            isHideLoadingStr: false,
             error: false,
             items: [],
+            locItems: [],
             in_method: "",
             in_key: 0,
             in_name: "",
             in_email: "",
-            in_role: "",
+            in_password: "",
+            in_locDate: "",
+            in_locEmail: "",
+            in_mapSrc: "",
+            in_addEditModalStr: "",
             pageOfItems: [],
             isNotif: false,
             notifCat: "default",
             notifStr: "",
-            modalLocOpen: false
+            modalLocShow: false,
+            modalAddEditShow: false,
+            modalDeleteShow: false,
+            in_submit: false
         }
     }
 
+    // Init get all users data
     UNSAFE_componentWillMount() {
         this.getUsers()
     }
@@ -37,12 +48,50 @@ class Dashboard extends React.Component {
         this.setState({ pageOfItems: pageOfItems });
     }
 
-    modalLocToggle = () => {
-        this.setState({
-            modalLocOpen: !this.state.modalLocOpen
-        });
+    // Handle for show modal
+    handleModalShow(modal, key, emailOrMethod) {
+        if ( modal === "modalLocShow" ) {
+            this.getUserLoc(modal, key, emailOrMethod) //Email parameter
+
+        } else if ( modal === "modalAddEditShow" || modal === "modalDeleteShow" ) {
+            this.userInfo(modal, key, emailOrMethod) //Method parameter
+
+        }else {
+            // Do Nothing
+        }
     }
 
+    // Handle for hide modal
+    handleModalClose(modal) {
+        this.setState({
+            [modal]: false
+        })
+    }
+
+    // Handle for location select box change and update google map src
+    handleLocChange(event) {
+        const target = event.target[event.target.selectedIndex]
+
+        this.setState({
+            in_locDate: event.target.value,
+            in_mapSrc: "https://maps.google.com/maps?q=" + target.getAttribute('data-latitude') + ", " + target.getAttribute('data-longitude') + "&hl=en&z=14&output=embed",
+        })
+    }
+
+    // Handle for input change
+    handleInputChange(fid, event) {
+        this.setState({
+            [fid]: event.target.value
+        })
+    }
+
+    // Handle for add edit and delete submit
+    handleAddEditDelSubmit(event) {
+        event.preventDefault();
+        this.sendCommandUsers(this.state.in_method)
+    }
+
+    // GLobal for reload page
     reloadPage = () => {
         setTimeout(
             function() {
@@ -51,6 +100,7 @@ class Dashboard extends React.Component {
         )
     }
 
+    // Ajax function for get all users
     getUsers(){
         $.ajax({
             url: "https://gutierrez-jerald-cv-be.herokuapp.com/api/exam-users",
@@ -94,21 +144,177 @@ class Dashboard extends React.Component {
         )
     }
 
-    sendCommandUsers = (method) => {
-        const { in_key, in_name, in_email, in_role } = this.state
-        
+    // Ajax function for get all user location by id
+    getUserLoc(modal, key, email){
         this.setState({
             isLoaded: false,
             isNotif: false,
             notifCat: "default",
         })
 
+        $.ajax({
+            url: "https://gutierrez-jerald-cv-be.herokuapp.com/api/exam-login-loc",
+            dataType: "json",
+            data: {
+                key: key
+            },
+            cache: false
+        })
+        .then(
+            (result) => {
+                if ( Object.keys(result).length !== 0 ) {
+                    this.setState({
+                        isLoaded: true,
+                        locItems: result,
+                        in_locDate: result[0].created_at,
+                        in_locEmail: email,
+                        in_mapSrc: "https://maps.google.com/maps?q=" + result[0].latitude + ", " + result[0].longitude + "&hl=en&z=14&output=embed",
+                        [modal]: true
+                    })
+                } else {
+                    this.setState({
+                        isLoaded: true,
+                        isNotif: true,
+                        notifCat: "info",
+                        notifStr: "No location found!"
+                    })
+                }
+            },
+            // Note: it's important to handle errors here
+            // instead of a catch() block so that we don't swallow
+            // exceptions from actual bugs in components.
+            (error) => {
+                this.setState({
+                    isLoaded: true,
+                    isNotif: true,
+                    notifCat: "error",
+                    notifStr: "Unexpected error, please reload the page!",
+                    error: true
+                })
+                    
+                console.error('Oh well, you failed. Here some thoughts on the error that occured:', error)
+            }
+        )
+        .catch(
+            (err) => {
+                this.setState({
+                    isLoaded: true,
+                    isNotif: true,
+                    notifCat: "error",
+                    notifStr: "Unexpected error, please reload the page!",
+                    error: true
+                })
+                    
+                console.error('Oh well, you failed. Here some thoughts on the error that occured:', err)
+            }
+        )
+    }
+
+    // Ajax function for get user info by id
+    userInfo(modal, key, method) {
+        if ( method === "add" ) {
+            this.setState({
+                isLoaded: true,
+                in_method: method,
+                in_name: "",
+                in_email: "",
+                in_addEditModalStr: "Add New User",
+                [modal]: true
+            })
+
+        } else if ( method === "edit" ) {
+            this.setState({
+                isLoaded: false,
+                isNotif: false,
+                notifCat: "default",
+            })
+
+            $.ajax({
+                url: "https://gutierrez-jerald-cv-be.herokuapp.com/api/exam-user-info",
+                dataType: "json",
+                data: {
+                    key: key
+                },
+                cache: false
+            })
+            .then(
+                (result) => {
+                    this.setState({
+                        isLoaded: true,
+                        in_method: method,
+                        in_key: key,
+                        in_name: result[0].name,
+                        in_email: result[0].email,
+                        in_addEditModalStr: "Edit User",
+                        [modal]: true
+                    })
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                    this.setState({
+                        isLoaded: true,
+                        isNotif: true,
+                        notifCat: "error",
+                        notifStr: "Unexpected error, please reload the page!",
+                        error: true
+                    })
+                        
+                    console.error('Oh well, you failed. Here some thoughts on the error that occured:', error)
+                }
+            )
+            .catch(
+                (err) => {
+                    this.setState({
+                        isLoaded: true,
+                        isNotif: true,
+                        notifCat: "error",
+                        notifStr: "Unexpected error, please reload the page!",
+                        error: true
+                    })
+                        
+                    console.error('Oh well, you failed. Here some thoughts on the error that occured:', err)
+                }
+            )
+        } else if ( method === "delete" ) {
+            this.setState({
+                isLoaded: true,
+                in_method: method,
+                in_key: key,
+                [modal]: true
+            })
+        } else {
+            // Do Nothing
+        }
+
+    }
+
+    // Ajax function for send command the add, edit and delete user
+    sendCommandUsers = (method) => {
+        const { in_key, in_name, in_email, in_password } = this.state
+        
+        this.setState({
+            isLoaded: false,
+            isHideLoadingStr: method === "delete" ? false : true,
+            in_submit: true,
+            isNotif: false,
+            notifCat: "default",
+        })
+
+        if ( method === "delete" ) {
+            // Hide modal
+            this.setState({
+                modalDeleteShow: false,
+            })
+        }
+
         const data = {
             method: method,
             key: in_key,
             name: in_name,
             email: in_email,
-            role: in_role,
+            pass: in_password
         }
 
         $.ajax({
@@ -121,6 +327,7 @@ class Dashboard extends React.Component {
             (result) => {
                 this.setState({
                     isLoaded: true,
+                    isHideLoadingStr: true,
                     isNotif: true
                 })
 
@@ -128,7 +335,6 @@ class Dashboard extends React.Component {
                 if ( result.response ) {
                     if ( this.state.in_method === "add" ) {
                         this.setState({
-                            isLoaded: false,
                             notifCat: "success",
                             notifStr: "Added successfully!"
                         })
@@ -146,7 +352,6 @@ class Dashboard extends React.Component {
 
                     } else if ( this.state.in_method === "delete" ) {
                         this.setState({
-                            isLoaded: false,
                             notifCat: "success",
                             notifStr: "Successfully deleted!"
                         })
@@ -155,22 +360,20 @@ class Dashboard extends React.Component {
 
                     } else {
                         this.setState({
+                            in_submit: false,
                             notifCat: "warning",
                             notifStr: "Something went wrong!",
                         })
                     }
                 } else if ( !result.response ) {
                     this.setState({
+                        in_submit: false,
                         notifCat: "warning",
                         notifStr: "Something went wrong!",
                     })
-                } else if ( result.response === "duplicate" ) {
-                    this.setState({
-                        notifCat: "warning",
-                        notifStr: "Duplicate record!",
-                    })
                 } else {
                     this.setState({
+                        in_submit: false,
                         notifCat: "error",
                         notifStr: "Unexpected error, please reload the page!",
                         error: true
@@ -184,6 +387,7 @@ class Dashboard extends React.Component {
                 // Handle errors here
                 this.setState({
                     isLoaded: true,
+                    isHideLoadingStr: false,
                     isNotif: true,
                     notifCat: "error",
                     notifStr: "Unexpected error, please reload the page!",
@@ -226,21 +430,110 @@ class Dashboard extends React.Component {
         return "";
     }
 
+    // Render modal for Location
     renderLocationModal() {
         return (
-            <MDBModal isOpen={this.state.modalLocOpen} toggle={this.modalLocToggle}>
-                <MDBModalHeader toggle={this.modalLocToggle}>MDBModal title</MDBModalHeader>
+            <Modal show={this.state.modalLocShow} onHide={this.handleModalClose.bind(this, "modalLocShow")}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Location</Modal.Title>
+                </Modal.Header>
                 <MDBModalBody>
-                    Here...
+                    <MDBInput label="Email" value={this.state.in_locEmail} readOnly />
+                    <MDBBox tag="div" className="select-mdb-custom">
+                        <MDBBox tag="select" className="select-mdb-content mb-3" value={this.state.in_locDate} onChange={this.handleLocChange.bind(this)}>
+                            {
+                                this.state.locItems.map((item) => (
+                                    <MDBBox tag="option" key={item.id} value={item.created_at} data-latitude={item.latitude} data-longitude={item.longitude}>
+                                        {item.created_at}
+                                    </MDBBox>
+                                ))
+                            }
+                        </MDBBox>
+                        <MDBBox tag="span" className="select-mdb-bar"></MDBBox>
+                        <MDBBox tag="label" className="col select-mdb-label">Date</MDBBox>
+                        <iframe
+                            width="100%" height="320" frameBorder="0"
+                            title="Map"
+                            src={this.state.in_mapSrc}>
+                            Loading...
+                        </iframe>
+                    </MDBBox>
                 </MDBModalBody>
-                <MDBModalFooter>
-                    <MDBBtn color="secondary" onClick={this.modalLocToggle}>Close</MDBBtn>
-                    <MDBBtn color="primary">Save changes</MDBBtn>
-                </MDBModalFooter>
-            </MDBModal>
+            </Modal>
         )
     }
 
+    // Render modal button submit for Add and Edit
+    renderAddEditSubmitElement(){
+        if ( this.state.in_submit ) {
+            // Already clicked the submit button
+            return (
+                <button type="submit" className="btn btn-default" disabled>
+                    <MDBIcon icon="spinner" className="fa-spin mr-2" />
+                    Loading
+                </button>
+            )
+        } else {
+            // Onload element display
+            return (
+                <button type="submit" className="btn btn-default">
+                    <MDBIcon icon="paper-plane" className="mr-2" />
+                    Update
+                </button>
+            )
+        }
+    }
+
+    // Render modal for Add and Edit
+    renderAddEditModal() {
+        return (
+            <Modal show={this.state.modalAddEditShow} onHide={this.handleModalClose.bind(this, "modalAddEditShow")}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{this.state.in_addEditModalStr}</Modal.Title>
+                </Modal.Header>
+                <MDBModalBody>
+                    <form onSubmit={this.handleAddEditDelSubmit.bind(this)}>
+                        <MDBBox tag="div" className="md-form">
+                            <MDBInput onChange={this.handleInputChange.bind(this, "in_name")} icon="user" label="Name" iconClass="grey-text" type="text" value={this.state.in_name} id="in_name" required />
+                        </MDBBox>
+                        <MDBBox tag="div" className="md-form">
+                            <MDBInput onChange={this.handleInputChange.bind(this, "in_email")} icon="envelope" label="Email" iconClass="grey-text" type="email" value={this.state.in_email} id="in_email" required readOnly={this.state.in_method === "edit" ? ("readOnly") : ("")} />
+                        </MDBBox>
+                        {
+                            this.state.in_method === "add" ? (
+                                <MDBBox tag="div" className="md-form">
+                                    <MDBInput onChange={this.handleInputChange.bind(this, "in_password")} icon="lock" label="Password" iconClass="grey-text" type="password" id="in_password" required />
+                                </MDBBox>
+                            ) : ("")
+                        }
+                        <MDBBox tag="div" className="text-center">
+                            {this.renderAddEditSubmitElement()}
+                        </MDBBox>
+                    </form>
+                </MDBModalBody>
+            </Modal>
+        )
+    }
+
+    // Render modal for Delete
+    renderDeleteModal() {
+        return (
+            <Modal size="sm" show={this.state.modalDeleteShow} onHide={this.handleModalClose.bind(this, "modalDeleteShow")}>
+                <Modal.Header className="danger-bg white-text text-center">
+                    <Modal.Title className="w-100">Are you sure?</Modal.Title>
+                </Modal.Header>
+                <MDBModalBody className="text-center">
+                    <MDBIcon icon="times" size="4x" className="animated rotateIn" />
+                </MDBModalBody>
+                <MDBModalFooter className="justify-content-center">
+                    <button className="btn btn-outline-danger waves-effect" onClick={this.handleAddEditDelSubmit.bind(this)}>Yes</button>
+                    <button className="btn btn-danger waves-effect" onClick={this.handleModalClose.bind(this, "modalDeleteShow")}>No</button>
+                </MDBModalFooter>
+            </Modal>
+        )
+    }
+
+    // Render data of all users in table
     renderData(data) {
         if ( Object.keys(this.state.items).length !== 0 ) {
             return (
@@ -253,22 +546,22 @@ class Dashboard extends React.Component {
                                 <td data-th="Email">{item.email}</td>
                                 <td data-th="Active">{item.is_active}</td>
                                 <td data-th="Location">
-                                    <MDBBox tag="span">See more...</MDBBox>
+                                    <MDBBox tag="span" className="cursor-pointer info-dark opacity-hover" onClick={this.handleModalShow.bind(this, "modalLocShow", item.id, item.email)}>See more...</MDBBox>
                                 </td>
                                 <td data-th="Created">{item.created_at}</td>
                                 <td data-th="" className="text-center actions">
                                     {
                                         this.getCookie("MRole") === "Administrator" ? (
                                             <React.Fragment>
-                                                <MDBIcon icon="edit" className="mr-1 cursor-pointer" />
-                                                <MDBIcon icon="trash" className="cursor-pointer" />
+                                                <MDBIcon icon="edit" className="mr-1 cursor-pointer opacity-hover" onClick={this.handleModalShow.bind(this, "modalAddEditShow", item.id, "edit")} />
+                                                <MDBIcon icon="trash" className="cursor-pointer opacity-hover" onClick={this.handleModalShow.bind(this, "modalDeleteShow", item.id, "delete")} />
                                             </React.Fragment>
-                                        ) : ("")
+                                        ) : (null)
                                     }
                                 </td>
                             </tr>
-                        ) : ("")
-                    ) : ("")
+                        ) : (null)
+                    ) : (null)
                 ))
             )
         } else {
@@ -289,8 +582,14 @@ class Dashboard extends React.Component {
                         // Loading
                         <MDBBox tag="div" className="loader-section">
                             <MDBBox tag="div" className="position-fixed z-index-9999 l-0 t-0 r-0 b-0 m-auto overflow-visible flex-center">
-                                <MDBBox tag="span" className="loader-spin-dual-ring"></MDBBox>
-                                <MDBBox tag="span" className="ml-2 font-size-1rem white-text">Loading, please wait...</MDBBox>
+                                {
+                                    !this.state.isHideLoadingStr ? (
+                                        <React.Fragment>
+                                            <MDBBox tag="span" className="loader-spin-dual-ring"></MDBBox>
+                                            <MDBBox tag="span" className="ml-2 font-size-1rem white-text">Loading, please wait...</MDBBox>
+                                        </React.Fragment>
+                                    ) : ("")
+                                }
                             </MDBBox>
                             <MDBBox tag="div" className="loader-backdrop position-fixed z-index-1040 l-0 t-0 r-0 b-0 black"></MDBBox>
                         </MDBBox>
@@ -304,11 +603,17 @@ class Dashboard extends React.Component {
                 }
 
                 <MDBContainer className="py-5">
-                    <MDBRow className="justify-content-end">
+                    <MDBRow className="justify-content-between">
+                        <MDBCol lg="2" className="mb-4">
+                            <button className="btn btn-info btn-block waves-effect px-2" onClick={this.handleModalShow.bind(this, "modalLocShow", this.getCookie("MTrack"), this.getCookie("MEmail"))}>
+                                <MDBIcon icon="map-marker-alt" className="mr-1" />
+                                View My Location
+                            </button>
+                        </MDBCol>
                         {
                             this.getCookie("MRole") === "Administrator" ?
                                 <MDBCol lg="2" className="mb-3">
-                                    <button className="btn btn-info btn-block waves-effect px-2">
+                                    <button className="btn btn-primary btn-block waves-effect px-2" onClick={this.handleModalShow.bind(this, "modalAddEditShow", 0, "add")}>
                                         <MDBIcon icon="plus" className="mr-1" />
                                         Add User
                                     </button>
@@ -342,6 +647,8 @@ class Dashboard extends React.Component {
                     </MDBRow>
                 </MDBContainer>
                 {this.renderLocationModal()}
+                {this.renderAddEditModal()}
+                {this.renderDeleteModal()}
             </React.Fragment>
         )
     }
