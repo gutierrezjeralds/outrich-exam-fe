@@ -63,7 +63,7 @@ class Cart extends React.Component {
                         return item
                     }
 
-                    return item
+                    return false
                 })
             })
         }
