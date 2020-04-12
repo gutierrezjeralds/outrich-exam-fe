@@ -1,15 +1,22 @@
 import React, { Component } from "react";
+import $ from 'jquery'
 import {
     MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavbarToggler, MDBNavItem, MDBCollapse, MDBDropdown,
-    MDBDropdownToggle, MDBDropdownMenu, MDBDropdownItem, MDBBox, MDBContainer
+    MDBDropdownToggle, MDBDropdownMenu, MDBDropdownItem, MDBBox, MDBContainer, MDBIcon, MDBBadge
 } from "mdbreact";
 
 class Header extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            isOpen: false
+            isOpen: false,
+            items: 0
         }
+    }
+
+    // Init get all cart count
+    UNSAFE_componentWillMount() {
+        this.getCartCount()
     }
     
     toggleCollapse = () => {
@@ -30,6 +37,53 @@ class Header extends Component {
         )
     }
 
+     // Ajax function for get all carts
+     getCartCount() {
+        $.ajax({
+            url: "https://gutierrez-jerald-cv-be.herokuapp.com/api/exam-get-cart-count",
+            dataType: "json",
+            data: {
+                userId: this.getCookie("MTrack")
+            },
+            cache: false
+        })
+        .then(
+            (result) => {
+                this.setState({
+                    items: result
+                })
+            },
+            // Note: it's important to handle errors here
+            // instead of a catch() block so that we don't swallow
+            // exceptions from actual bugs in components.
+            (error) => {
+                console.error('Oh well, you failed. Here some thoughts on the error that occured:', error)
+            }
+        )
+        .catch(
+            (err) => {
+                console.error('Oh well, you failed. Here some thoughts on the error that occured:', err)
+            }
+        )
+    }
+
+    // Get Cookie
+    getCookie(cname) {
+        var name = cname + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(';');
+        for(var i = 0; i <ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) === ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) === 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+
     render() {
         return (
             <MDBNavbar color="indigo" dark expand="md" fixed="top">
@@ -43,11 +97,20 @@ class Header extends Component {
                             {/* <MDBNavItem active>
                                 <MDBNavLink to="dashboard">Dashboard</MDBNavLink>
                             </MDBNavItem> */}
-                            <li className="nav-item active">
+                            <MDBNavItem active>
                                 <a className="nav-link waves-effect waves-light" href="/dashboard">Dashboard</a>
-                            </li>
+                            </MDBNavItem>
+                            <MDBNavItem>
+                                <a className="nav-link waves-effect waves-light" href="/product">Product</a>
+                            </MDBNavItem>
                         </MDBNavbarNav>
                         <MDBNavbarNav right>
+                        <MDBNavItem>
+                            <a className="nav-link waves-effect waves-light" href="/cart">
+                                <MDBIcon icon="shopping-cart" />
+                                <MDBBadge color="" className="ml-2 white-text badge-info">{this.state.items}</MDBBadge>
+                            </a>
+                        </MDBNavItem>
                             <MDBNavItem>
                                 <MDBDropdown>
                                     <MDBDropdownToggle nav caret>

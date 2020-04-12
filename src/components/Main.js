@@ -4,6 +4,8 @@ import Footer from './Footer'
 import Login from './views/Login'
 import Dashboard from './views/Dashboard'
 import EditProfile from './views/Edit-Profile'
+import Product from './views/Product'
+import Cart from './views/Cart'
 import { MDBBox } from 'mdbreact'
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 
@@ -36,6 +38,18 @@ class Main extends React.Component {
                     render: <EditProfile />,
                     wrapper: "edit-profile",
                     path: "/edit-profile"
+                },
+                {
+                    id: 4,
+                    render: <Product />,
+                    wrapper: "product",
+                    path: "/product"
+                },
+                {
+                    id: 5,
+                    render: <Cart />,
+                    wrapper: "cart",
+                    path: "/cart"
                 }
                 // {
                 //     id: 0,

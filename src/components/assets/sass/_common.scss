@@ -530,6 +530,61 @@ body, #root{
     }
 }
 
+// Input Checkbox MDB Style
+.checkbox-mdb-custom{
+    display: inline-block;
+    padding-left: 0px;
+    input[type="checkbox"] {
+        display: none;
+    }
+    input[type="checkbox"]+label{
+        display: inline-block;
+        position: relative;
+        cursor: pointer;
+        width: 100%;
+        max-width: 100%;
+        min-width: 200px;
+        padding-left: 35px;
+        &:before{
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            width: 18px;
+            height: 18px;
+            margin-top: 3px;
+            border: 2px solid $blue-whale;
+            border-radius: 1px;
+            -webkit-transition: .2s;
+            transition: .2s;
+        }
+    }
+    input[type="checkbox"]:checked+label{
+        &:before{
+            top: -5px;
+            left: -5px;
+            width: 12px;
+            height: 1.375rem;
+            border-top: 2px solid transparent;
+            border-right: 2px solid $blue-whale;
+            border-bottom: 2px solid $blue-whale;
+            border-left: 2px solid transparent;
+            -webkit-transform: rotate(40deg);
+            transform: rotate(40deg);
+            -webkit-transform-origin: 100% 100%;
+            transform-origin: 100% 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+    }
+    &.transparent-label {
+        label{
+            color: $transparent !important;
+        }
+    }
+}
+
 .table-responsive-cs {
     margin: 0 auto;
     border: none;

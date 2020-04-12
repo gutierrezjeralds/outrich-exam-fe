@@ -56,7 +56,7 @@ class Dashboard extends React.Component {
         } else if ( modal === "modalAddEditShow" || modal === "modalDeleteShow" ) {
             this.userInfo(modal, key, emailOrMethod) //Method parameter
 
-        }else {
+        } else {
             // Do Nothing
         }
     }
@@ -210,7 +210,7 @@ class Dashboard extends React.Component {
         )
     }
 
-    // Ajax function for get user info by id
+    // Ajax function for get user info by id and open modal
     userInfo(modal, key, method) {
         if ( method === "add" ) {
             this.setState({
@@ -484,7 +484,7 @@ class Dashboard extends React.Component {
             return (
                 <button type="submit" className="btn btn-default">
                     <MDBIcon icon="paper-plane" className="mr-2" />
-                    Update
+                    Submit
                 </button>
             )
         }
@@ -503,14 +503,14 @@ class Dashboard extends React.Component {
                             <MDBInput onChange={this.handleInputChange.bind(this, "in_name")} icon="user" label="Name" iconClass="grey-text" type="text" value={this.state.in_name} id="in_name" required />
                         </MDBBox>
                         <MDBBox tag="div" className="md-form">
-                            <MDBInput onChange={this.handleInputChange.bind(this, "in_email")} icon="envelope" label="Email" iconClass="grey-text" type="email" value={this.state.in_email} id="in_email" required readOnly={this.state.in_method === "edit" ? ("readOnly") : ("")} />
+                            <MDBInput onChange={this.handleInputChange.bind(this, "in_email")} icon="envelope" label="Email" iconClass="grey-text" type="email" value={this.state.in_email} id="in_email" required readOnly={this.state.in_method === "edit" ? ("readOnly") : (null)} />
                         </MDBBox>
                         {
                             this.state.in_method === "add" ? (
                                 <MDBBox tag="div" className="md-form">
                                     <MDBInput onChange={this.handleInputChange.bind(this, "in_password")} icon="lock" label="Password" iconClass="grey-text" type="password" id="in_password" required />
                                 </MDBBox>
-                            ) : ("")
+                            ) : (null)
                         }
                         <MDBBox tag="div" className="text-center">
                             {this.renderAddEditSubmitElement()}
@@ -594,18 +594,18 @@ class Dashboard extends React.Component {
                                             <MDBBox tag="span" className="loader-spin-dual-ring"></MDBBox>
                                             <MDBBox tag="span" className="ml-2 font-size-1rem white-text">Loading, please wait...</MDBBox>
                                         </React.Fragment>
-                                    ) : ("")
+                                    ) : (null)
                                 }
                             </MDBBox>
                             <MDBBox tag="div" className="loader-backdrop position-fixed z-index-1040 l-0 t-0 r-0 b-0 black"></MDBBox>
                         </MDBBox>
-                    ) : ("")
+                    ) : (null)
                 }
 
                 {
                     this.state.isNotif ? (
                         <Snackbar category={this.state.notifCat} string={this.state.notifStr} />
-                    ) : ("")
+                    ) : (null)
                 }
 
                 <MDBContainer className="py-5">
@@ -647,7 +647,7 @@ class Dashboard extends React.Component {
                             {
                                 Object.keys(this.state.items).length !== 0 ? (
                                     <Pagination items={this.state.items} onChangePage={this.onChangePage.bind(this)} />
-                                ) : ("")
+                                ) : (null)
                             }
                         </MDBCol>
                     </MDBRow>
