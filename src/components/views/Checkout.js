@@ -5,25 +5,23 @@ import {
     MDBContainer, MDBRow, MDBCol, MDBBox, MDBIcon, MDBCard, MDBCardBody, MDBMedia
 } from "mdbreact";
 
-class Cart extends React.Component {
+class Checkout extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
             isLoaded: false,
             isHideLoadingStr: false,
-            in_submit: false,
             isNotif: false,
             notifCat: "default",
             notifStr: "",
             items: [],
             in_total: 0,
-            dataCheckout: []
         }
     }
 
-    // Init get all cart list
+    // Init get all checkout list
     UNSAFE_componentWillMount() {
-        this.getCarts()
+        this.getCheckouts()
     }
 
     // Default img src
@@ -31,148 +29,16 @@ class Cart extends React.Component {
         event.target.src = "/assets/img/background/bg-item-1.png"
     }
 
-    // Handle change for checkbox
-    handleCheckChange(event) {
-        const productId = event.target.getAttribute('dataproductid')
-        const productPrice = event.target.getAttribute('dataproductprice')
-        const cartId = event.target.getAttribute('datacartid')
-
-        if ( event.target.checked ) {
-            this.setState( prevState => ({
-                in_total: parseInt(productPrice) + parseInt(prevState.in_total)
-            }))
-
-            // Add Json data for checkout
-            this.setState({
-                dataCheckout: [...this.state.dataCheckout, {
-                    id: Date.now(),
-                    user_id: this.getCookie("MTrack"),
-                    product_id: productId,
-                    cart_id: cartId
-                }]
-            })
-        } else {
-            this.setState( prevState => ({
-                in_total: parseInt(prevState.in_total) - parseInt(productPrice)
-            }))
-
-            // Delete Json data for checkout
-            this.setState({
-                dataCheckout: this.state.dataCheckout.filter(item => {
-                    if ( item.product_id !== productId ) {
-                        return item
-                    }
-
-                    return false
-                })
-            })
-        }
-    }
-
-    handleCheckoutSubmit() {
+    handleBuySubmit() {
         this.setState({
             isLoaded: false,
             isHideLoadingStr: false,
-            in_submit: true,
             isNotif: false,
             notifCat: "default",
         })
 
-        if ( Object.keys(this.state.dataCheckout).length !== 0 ) {
-            // This will be send Json (dataCheckout) into api to save it in checkout db
-            const data = {
-                userId: this.getCookie("MTrack"),
-                checkout: this.state.dataCheckout
-            }
-
-            $.ajax({
-                url: "https://gutierrez-jerald-cv-be.herokuapp.com/api/exam-set-checkout",
-                type: 'POST',
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                cache: false
-            }).then(
-                (result) => {
-                    this.setState({
-                        isLoaded: true,
-                        isNotif: true
-                    })
-    
-                    // Conditional alert message
-                    if ( result.response === true || result.response === "true" || result.response === "success" ) {
-                        this.setState({
-                            notifCat: "success",
-                            notifStr: "Checkout successfully!"
-                        })
-
-                        setTimeout(
-                            function() {
-                                window.location.href = "/checkout"
-                            } , 100
-                        )
-    
-                    } else if ( result.response === false || result.response === "false" ) {
-                        this.setState({
-                            in_submit: false,
-                            notifCat: "warning",
-                            notifStr: "Something went wrong!",
-                        })
-                    } else {
-                        this.setState({
-                            in_submit: false,
-                            notifCat: "error",
-                            notifStr: "Unexpected error, please reload the page!",
-                            error: true
-                        })
-                    }
-                },
-                // Note: it's important to handle errors here
-                // instead of a catch() block so that we don't swallow
-                // exceptions from actual bugs in components.
-                (error) => {
-                    // Handle errors here
-                    this.setState({
-                        isLoaded: true,
-                        isHideLoadingStr: false,
-                        isNotif: true,
-                        notifCat: "error",
-                        notifStr: "Unexpected error, please reload the page!",
-                        error: true
-                    })
-    
-                    console.error('Oh well, you failed. Here some thoughts on the error that occured:', error)
-                }
-            )
-            .catch(
-                (err) => {
-                    // Handle errors here
-                    this.setState({
-                        isLoaded: true,
-                        isNotif: true,
-                        notifCat: "error",
-                        notifStr: "Unexpected error, please reload the page!",
-                        error: true
-                    })
-                    
-                    console.error('Oh well, you failed. Here some thoughts on the error that occured:', err)
-                }
-            )
-
-        } else {
-            this.setState({
-                isLoaded: true,
-                in_submit: false,
-                isNotif: true,
-                notifCat: "warning",
-                notifStr: "Please add item to Checkout!",
-            })
-        }
-    }
-
-    // Ajax fucntion for get all cart
-    getCarts() {
         $.ajax({
-            url: "https://gutierrez-jerald-cv-be.herokuapp.com/api/exam-get-cart",
+            url: "https://gutierrez-jerald-cv-be.herokuapp.com/api/exam-product-buy",
             dataType: "json",
             data: {
                 userId: this.getCookie("MTrack")
@@ -182,14 +48,25 @@ class Cart extends React.Component {
         .then(
             (result) => {
                 this.setState({
-                    isLoaded: true
+                    isLoaded: true,
+                    isNotif: true
                 })
-                
-                if ( result.response === 'fail' || result.response === 'empty' ) {
-                    // Do Nothing
+
+                if ( result.response === 'success' ) {
+                    this.setState({
+                        notifCat: "success",
+                        notifStr: "Buy product successfully!"
+                    })
+
+                    setTimeout(
+                        function() {
+                            window.location.href = "/product"
+                        } , 100
+                    )
                 } else {
                     this.setState({
-                        items: result
+                        notifCat: "warning",
+                        notifStr: "Something went wrong!",
                     })
                 }
             },
@@ -221,6 +98,74 @@ class Cart extends React.Component {
                 console.error('Oh well, you failed. Here some thoughts on the error that occured:', err)
             }
         )
+    }
+
+    // Ajax fucntion for get all checkout
+    getCheckouts() {
+        $.ajax({
+            url: "https://gutierrez-jerald-cv-be.herokuapp.com/api/exam-get-checkout",
+            dataType: "json",
+            data: {
+                userId: this.getCookie("MTrack")
+            },
+            cache: false
+        })
+        .then(
+            (result) => {
+                this.setState({
+                    isLoaded: true
+                })
+                
+                if ( result.response === 'fail' || result.response === 'empty' ) {
+                    // Do Nothing
+                } else {
+                    this.setState({
+                        items: result
+                    })
+    
+                    // Display Total
+                    this.getTotalProducts(result)
+                }
+            },
+            // Note: it's important to handle errors here
+            // instead of a catch() block so that we don't swallow
+            // exceptions from actual bugs in components.
+            (error) => {
+                this.setState({
+                    isLoaded: true,
+                    isNotif: true,
+                    notifCat: "error",
+                    notifStr: "Unexpected error, please reload the page!",
+                    error: true
+                })
+                    
+                console.error('Oh well, you failed. Here some thoughts on the error that occured:', error)
+            }
+        )
+        .catch(
+            (err) => {
+                this.setState({
+                    isLoaded: true,
+                    isNotif: true,
+                    notifCat: "error",
+                    notifStr: "Unexpected error, please reload the page!",
+                    error: true
+                })
+                    
+                console.error('Oh well, you failed. Here some thoughts on the error that occured:', err)
+            }
+        )
+    }
+
+    // Display total amount of products
+    getTotalProducts(data) {
+        if ( Object.keys(data).length !== 0 ) {
+            data.map(items => (
+                this.setState( prevState => ({
+                    in_total: parseInt(items.product_price) + parseInt(prevState.in_total)
+                }))
+            ))
+        }
     }
 
     // Get Cookie
@@ -280,29 +225,18 @@ class Cart extends React.Component {
                                         </MDBBox>
                                     </MDBCol>
                                     <MDBCol lg="2" className="mb-3">
-                                        <button className="btn btn-default btn-block waves-effect px-2" onClick={this.handleCheckoutSubmit.bind(this)}>
-                                            <MDBIcon icon="shopping-basket" className="mr-1" />
-                                            Checkout
+                                        <button className="btn btn-default btn-block waves-effect px-2" onClick={this.handleBuySubmit.bind(this)}>
+                                            <MDBIcon icon="shopping-bag" className="mr-1" />
+                                            Buy
                                         </button>
                                     </MDBCol>
                                 </MDBRow>
                                 <MDBRow>
                                     {
                                         this.state.items.map(items => (
-                                            <MDBCol lg="12" key={items.cart_id}>
+                                            <MDBCol lg="12" key={items.checkout_id}>
                                                 <MDBCard>
                                                     <MDBCardBody>
-                                                        {/* <MDBInput containerClass="md-form mt-0 checkbox-mdb-custom transparent-label" label="Checkout" type="checkbox" id="isCheckout-checkbox" dataproductid={items.product_id} onChange={this.handleCheckChange.bind(this)} /> */}
-                                                        <MDBBox className="form-check md-form mt-0 checkbox-mdb-custom transparent-label">
-                                                            <input type="checkbox" className="form-control" id="isCheckout-checkbox" value="" 
-                                                                dataproductid={items.product_id}
-                                                                dataproductprice={items.product_price}
-                                                                datacartid={items.cart_id}
-                                                                onChange={this.handleCheckChange.bind(this)} />
-                                                            <label className="form-check-label" htmlFor="isCheckout-checkbox">
-                                                                Checkout
-                                                            </label>
-                                                        </MDBBox>
                                                         <MDBMedia>
                                                             <MDBMedia left className="mr-3">
                                                                 <MDBMedia object src="/assets/img/background/bg-item-1.png" alt="Product" width="80" onError={this.thisDefaultSrc} />
@@ -334,4 +268,4 @@ class Cart extends React.Component {
     }
 }
 
-export default Cart
+export default Checkout

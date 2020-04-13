@@ -6,6 +6,7 @@ import Dashboard from './views/Dashboard'
 import EditProfile from './views/Edit-Profile'
 import Product from './views/Product'
 import Cart from './views/Cart'
+import Checkout from './views/Checkout'
 import { MDBBox } from 'mdbreact'
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 
@@ -50,6 +51,12 @@ class Main extends React.Component {
                     render: <Cart />,
                     wrapper: "cart",
                     path: "/cart"
+                },
+                {
+                    id: 6,
+                    render: <Checkout />,
+                    wrapper: "checkout",
+                    path: "/checkout"
                 }
                 // {
                 //     id: 0,
