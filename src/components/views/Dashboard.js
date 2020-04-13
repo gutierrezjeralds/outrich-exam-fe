@@ -2,6 +2,7 @@ import React from 'react'
 import Snackbar from "../views/includes/Snackbar"
 import Pagination from "../views/includes/Pagination"
 import $ from 'jquery'
+import { Pie } from "react-chartjs-2";
 import { 
     MDBContainer, MDBRow, MDBCol, MDBBox, MDBInput,
     MDBTable, MDBTableBody, MDBTableHead,
@@ -34,7 +35,10 @@ class Dashboard extends React.Component {
             modalLocShow: false,
             modalAddEditShow: false,
             modalDeleteShow: false,
-            in_submit: false
+            modalGraphUsersShow: false,
+            in_submit: false,
+            in_chart: "pie",
+            in_dataChart: {}
         }
     }
 
@@ -55,6 +59,9 @@ class Dashboard extends React.Component {
 
         } else if ( modal === "modalAddEditShow" || modal === "modalDeleteShow" ) {
             this.userInfo(modal, key, emailOrMethod) //Method parameter
+
+        } else if ( modal === "modalGraphUsersShow" ) {
+            this.userGraph(modal)
 
         } else {
             // Do Nothing
@@ -419,6 +426,98 @@ class Dashboard extends React.Component {
         )
     }
 
+    // Ajax function for show user graph
+    userGraph(modal) {
+        // const { in_chart } = this.state
+        const in_chart = "pie"
+
+        this.setState({
+            isLoaded: false
+        })
+
+        $.ajax({
+            url: "https://gutierrez-jerald-cv-be.herokuapp.com/api/exam-user-chart",
+            dataType: "json",
+            data: {
+                chart: in_chart
+            },
+            cache: false
+        })
+        .then(
+            (result) => {
+                if ( result.response === 'fail' || result.response === 'empty' ) {
+                    // Do Nothing
+                    this.setState({
+                        isLoaded: true,
+                        isNotif: true,
+                        notifCat: "warning",
+                        notifStr: "Something went wrong!",
+                    })
+                } else {
+                    // Success
+                    this.setState({
+                        isLoaded: true
+                    })
+    
+                    if ( modal !== undefined) {
+                        this.setState({
+                            [modal]: true
+                        })
+                    }
+    
+                    // Add data from api
+                    if ( in_chart === "pie" ) {
+                        this.setState({
+                            in_dataChart: {
+                                labels: ["Active", "Inactive"],
+                                datasets: [
+                                    {
+                                        data: result.response,
+                                        backgroundColor: [
+                                            "#46BFBD",
+                                            "#F7464A"
+                                        ],
+                                        hoverBackgroundColor: [
+                                            "#5AD3D1",
+                                            "#FF5A5E"
+                                        ]
+                                    }
+                                ]
+                            }
+                        })
+                    }
+                }
+            },
+            // Note: it's important to handle errors here
+            // instead of a catch() block so that we don't swallow
+            // exceptions from actual bugs in components.
+            (error) => {
+                this.setState({
+                    isLoaded: true,
+                    isNotif: true,
+                    notifCat: "error",
+                    notifStr: "Unexpected error, please reload the page!",
+                    error: true
+                })
+                    
+                console.error('Oh well, you failed. Here some thoughts on the error that occured:', error)
+            }
+        )
+        .catch(
+            (err) => {
+                this.setState({
+                    isLoaded: true,
+                    isNotif: true,
+                    notifCat: "error",
+                    notifStr: "Unexpected error, please reload the page!",
+                    error: true
+                })
+                    
+                console.error('Oh well, you failed. Here some thoughts on the error that occured:', err)
+            }
+        )
+    }
+
     // Get Cookie
     getCookie(cname) {
         var name = cname + "=";
@@ -457,13 +556,13 @@ class Dashboard extends React.Component {
                         </MDBBox>
                         <MDBBox tag="span" className="select-mdb-bar"></MDBBox>
                         <MDBBox tag="label" className="col select-mdb-label">Date</MDBBox>
-                        <iframe
-                            width="100%" height="320" frameBorder="0"
-                            title="Map"
-                            src={this.state.in_mapSrc}>
-                            Loading...
-                        </iframe>
                     </MDBBox>
+                    <iframe
+                        width="100%" height="320" frameBorder="0"
+                        title="Map"
+                        src={this.state.in_mapSrc}>
+                        Loading...
+                    </iframe>
                 </MDBModalBody>
             </Modal>
         )
@@ -535,6 +634,28 @@ class Dashboard extends React.Component {
                     <button className="btn btn-outline-danger waves-effect" onClick={this.handleAddEditDelSubmit.bind(this)}>Yes</button>
                     <button className="btn btn-danger waves-effect" onClick={this.handleModalClose.bind(this, "modalDeleteShow")}>No</button>
                 </MDBModalFooter>
+            </Modal>
+        )
+    }
+    
+    // Render modal for graph of users
+    renderGraphUsersModal() {
+        return (
+            <Modal show={this.state.modalGraphUsersShow} onHide={this.handleModalClose.bind(this, "modalGraphUsersShow")}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Users Chart</Modal.Title>
+                </Modal.Header>
+                <MDBModalBody>
+                    <MDBBox tag="div" className="select-mdb-custom">
+                        <MDBBox tag="select" className="select-mdb-content mb-3" value={this.state.in_chart} onChange={this.handleInputChange.bind(this, "in_chart")}>
+                            <MDBBox tag="option" value="pie">Pie</MDBBox>
+                            <MDBBox tag="option" value="line">Line</MDBBox>
+                        </MDBBox>
+                        <MDBBox tag="span" className="select-mdb-bar"></MDBBox>
+                        <MDBBox tag="label" className="col select-mdb-label">Chart</MDBBox>
+                    </MDBBox>
+                    <Pie data={this.state.in_dataChart} options={{ responsive: true }} />
+                </MDBModalBody>
             </Modal>
         )
     }
@@ -610,7 +731,7 @@ class Dashboard extends React.Component {
 
                 <MDBContainer className="py-5">
                     <MDBRow className="justify-content-between">
-                        <MDBCol lg="2" className="mb-4">
+                        <MDBCol lg="2" className="mb-2">
                             <button className="btn btn-info btn-block waves-effect px-2" onClick={this.handleModalShow.bind(this, "modalLocShow", this.getCookie("MTrack"), this.getCookie("MEmail"))}>
                                 <MDBIcon icon="map-marker-alt" className="mr-1" />
                                 View My Location
@@ -618,13 +739,21 @@ class Dashboard extends React.Component {
                         </MDBCol>
                         {
                             this.getCookie("MRole") === "Administrator" ?
-                                <MDBCol lg="2" className="mb-3">
-                                    <button className="btn btn-primary btn-block waves-effect px-2" onClick={this.handleModalShow.bind(this, "modalAddEditShow", 0, "add")}>
-                                        <MDBIcon icon="plus" className="mr-1" />
-                                        Add User
-                                    </button>
-                                </MDBCol>
-                            : ""
+                                <React.Fragment>
+                                    <MDBCol lg="2" className="mb-2">
+                                        <button className="btn btn-info btn-block waves-effect px-2" onClick={this.handleModalShow.bind(this, "modalGraphUsersShow", 0, "")}>
+                                            <MDBIcon icon="chart-bar" className="mr-1" />
+                                            View Active Users
+                                        </button>
+                                    </MDBCol>
+                                    <MDBCol lg="2" className="mb-3">
+                                        <button className="btn btn-primary btn-block waves-effect px-2" onClick={this.handleModalShow.bind(this, "modalAddEditShow", 0, "add")}>
+                                            <MDBIcon icon="plus" className="mr-1" />
+                                            Add User
+                                        </button>
+                                    </MDBCol>
+                                </React.Fragment>
+                            : null
                         }
 
                         <MDBCol lg="12">
@@ -655,6 +784,7 @@ class Dashboard extends React.Component {
                 {this.renderLocationModal()}
                 {this.renderAddEditModal()}
                 {this.renderDeleteModal()}
+                {this.renderGraphUsersModal()}
             </React.Fragment>
         )
     }
