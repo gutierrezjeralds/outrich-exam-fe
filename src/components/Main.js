@@ -1,6 +1,7 @@
 import React from 'react'
 import Header from './Header'
 import Footer from './Footer'
+import NotFound from './views/Not-Found'
 import Login from './views/Login'
 import Dashboard from './views/Dashboard'
 import EditProfile from './views/Edit-Profile'
@@ -57,13 +58,13 @@ class Main extends React.Component {
                     render: <Checkout />,
                     wrapper: "checkout",
                     path: "/checkout"
+                },
+                {
+                    id: 0,
+                    render: <NotFound />,
+                    wrapper: "notFound",
+                    path: "*"
                 }
-                // {
-                //     id: 0,
-                //     render: <NotFound />,
-                //     wrapper: "notFound",
-                //     path: "*"
-                // }
             ]
         }
     }

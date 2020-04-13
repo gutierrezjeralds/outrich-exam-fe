@@ -30,10 +30,26 @@ class Header extends Component {
         var expires = "expires="+ d.toUTCString();
         document.cookie = "authenticate=false;" + expires + ";path=/";
 
-        setTimeout(
-            function() {
-                window.location.href = "/login"
-            } , 100
+        // Logout ajax
+        $.ajax({
+            url: "https://gutierrez-jerald-cv-be.herokuapp.com/api/exam-logout",
+            dataType: "json",
+            data: {
+                userId: this.getCookie("MTrack")
+            },
+            cache: false
+        })
+        .then(
+            setTimeout(
+                function() {
+                    window.location.href = "/login"
+                } , 100
+            )
+        )
+        .catch(
+            (err) => {
+                console.error('Oh well, you failed. Here some thoughts on the error that occured:', err)
+            }
         )
     }
 
