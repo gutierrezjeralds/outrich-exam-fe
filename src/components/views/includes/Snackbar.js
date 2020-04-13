@@ -53,7 +53,7 @@ class Snackbar extends React.Component {
     render () {
         return (
             <React.Fragment>
-                <MDBAnimation type={this.state.isShow} className="z-index-9999">
+                <MDBAnimation type={this.state.isShow} className="z-index-9999 position-relative">
                     <MDBBox tag="div" className={this.props.category + " snackbar-content position-fixed z-index-9999 white-text rounded p-3 w-300px"}>
                         <MDBMedia>
                             <MDBMedia left middle className="mr-2 pb-0">
