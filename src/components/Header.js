@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import $ from 'jquery'
+import Moment from 'react-moment';
 import {
     MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavbarToggler, MDBNavItem, MDBCollapse, MDBDropdown,
     MDBDropdownToggle, MDBDropdownMenu, MDBDropdownItem, MDBBox, MDBContainer, MDBIcon, MDBBadge
@@ -116,7 +117,6 @@ class Header extends Component {
         })
         .then(
             (result) => {
-                console.log(result)
                 if ( result.response !== "fail" ) {
                     this.setState({
                         itemNotif: result.response
@@ -213,7 +213,7 @@ class Header extends Component {
                                                                 }
                                                             >
                                                                 <MDBBox tag="span" className="d-block"><strong>{item.name}</strong> Update the profile.</MDBBox>
-                                                                <MDBBox tag="span" className="d-block font-size-pt7rem">{item.updated_at}</MDBBox>
+                                                                <MDBBox tag="span" className="d-block font-size-pt7rem"><Moment fromNow>{item.updated_at}</Moment></MDBBox>
                                                             </MDBBox>
                                                         </MDBBox>
                                                     ))

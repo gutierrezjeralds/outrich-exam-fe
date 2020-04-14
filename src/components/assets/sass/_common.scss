@@ -334,6 +334,10 @@ body, #root{
     overflow-x: hidden;
 }
 
+footer {
+    background-color: $overcast;
+}
+
 // Loader
 .loader-section {
     .loader-spin-dual-ring {
