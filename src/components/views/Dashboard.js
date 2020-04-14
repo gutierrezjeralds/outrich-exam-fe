@@ -652,7 +652,7 @@ class Dashboard extends React.Component {
                     <MDBBox tag="div" className="select-mdb-custom">
                         <MDBBox tag="select" className="select-mdb-content mb-3" value={this.state.in_chart} onChange={this.handleInputChange.bind(this, "in_chart")}>
                             <MDBBox tag="option" value="pie">Pie</MDBBox>
-                            <MDBBox tag="option" value="line">Line</MDBBox>
+                            {/* <MDBBox tag="option" value="line">Line</MDBBox> */}
                         </MDBBox>
                         <MDBBox tag="span" className="select-mdb-bar"></MDBBox>
                         <MDBBox tag="label" className="col select-mdb-label">Chart</MDBBox>
