@@ -2,6 +2,7 @@ import React from 'react'
 import Snackbar from "../views/includes/Snackbar"
 import Pagination from "../views/includes/Pagination"
 import $ from 'jquery'
+import Moment from 'react-moment';
 import { Pie } from "react-chartjs-2";
 import { 
     MDBContainer, MDBRow, MDBCol, MDBBox, MDBInput,
@@ -343,11 +344,12 @@ class Dashboard extends React.Component {
                 if ( result.response === true || result.response === "true" ) {
                     if ( this.state.in_method === "add" ) {
                         this.setState({
+                            in_submit: false,
                             notifCat: "success",
                             notifStr: "Added successfully!"
                         })
                         //Reload page
-                        this.reloadPage()
+                        // this.reloadPage()
 
                     } else if ( this.state.in_method === "edit" ) {
                         this.setState({
@@ -676,7 +678,11 @@ class Dashboard extends React.Component {
                                 <td data-th="Location">
                                     <MDBBox tag="span" className="cursor-pointer info-dark opacity-hover" onClick={this.handleModalShow.bind(this, "modalLocShow", item.id, item.email)}>See more...</MDBBox>
                                 </td>
-                                <td data-th="Created">{item.created_at}</td>
+                                <td data-th="Created">
+                                    <Moment format="MMM DD, Y">
+                                        {item.created_at}
+                                    </Moment>
+                                </td>
                                 <td data-th="" className="text-center actions">
                                     {
                                         this.getCookie("MRole") === "Administrator" ? (
