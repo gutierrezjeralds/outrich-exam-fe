@@ -102,6 +102,7 @@ class EditProfile extends React.Component {
             key: this.getCookie("MTrack"),
             name: this.state.in_name,
             pass: this.state.in_password,
+            date: new Date().toUTCString()
         }
 
         this.setState({

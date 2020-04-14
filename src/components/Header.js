@@ -10,17 +10,37 @@ class Header extends Component {
         super(props)
         this.state = {
             isOpen: false,
-            items: 0
+            in_userId: 0,
+            itemCart: 0,
+            itemNotif: [],
+            itemNotifCount: 0
         }
     }
 
     // Init get all cart count
     UNSAFE_componentWillMount() {
+        this.setState({
+            in_userId: this.getCookie("MTrack")
+        })
+
         this.getCartCount()
+
+        if ( this.getCookie("MRole") === "Administrator" ) {
+            // Get user notification
+            this.getNotif()
+        }
     }
     
     toggleCollapse = () => {
         this.setState({ isOpen: !this.state.isOpen });
+    }
+
+    handleNotifClick() {
+        // Update dummy date in cookie // Remove notifcation count
+        this.setCookie("MNotifDate", new Date().toUTCString(), 30)
+        this.setState({
+            itemNotifCount: 0
+        })
     }
 
     handleLogout() {
@@ -35,7 +55,7 @@ class Header extends Component {
             url: "https://gutierrez-jerald-cv-be.herokuapp.com/api/exam-logout",
             dataType: "json",
             data: {
-                userId: this.getCookie("MTrack")
+                userId: arguments[0]
             },
             cache: false
         })
@@ -66,7 +86,7 @@ class Header extends Component {
         .then(
             (result) => {
                 this.setState({
-                    items: result
+                    itemCart: result
                 })
             },
             // Note: it's important to handle errors here
@@ -81,6 +101,57 @@ class Header extends Component {
                 console.error('Oh well, you failed. Here some thoughts on the error that occured:', err)
             }
         )
+    }
+
+    // Ajax for user notifcation
+    getNotif() {
+        $.ajax({
+            url: "https://gutierrez-jerald-cv-be.herokuapp.com/api/exam-user-notif",
+            dataType: "json",
+            data: {
+                userId: this.getCookie("MTrack"),
+                date: this.getCookie("MNotifDate")
+            },
+            cache: false
+        })
+        .then(
+            (result) => {
+                console.log(result)
+                if ( result.response !== "fail" ) {
+                    this.setState({
+                        itemNotif: result.response
+                    })
+                    
+                    let counter = 0
+                    result.response.map(item => (
+                        item.new === 1 ? (
+                            this.setState( prevState => ({
+                                itemNotifCount: parseInt(counter+= 1) + parseInt(prevState.itemNotifCount)
+                            }))
+                        ) : null
+                    ))
+                }
+            },
+            // Note: it's important to handle errors here
+            // instead of a catch() block so that we don't swallow
+            // exceptions from actual bugs in components.
+            (error) => {
+                console.error('Oh well, you failed. Here some thoughts on the error that occured:', error)
+            }
+        )
+        .catch(
+            (err) => {
+                console.error('Oh well, you failed. Here some thoughts on the error that occured:', err)
+            }
+        )
+    }
+
+    // Set Cookie
+    setCookie(cname, cvalue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays*24*60*60*1000));
+        var expires = "expires="+ d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
     }
 
     // Get Cookie
@@ -121,12 +192,43 @@ class Header extends Component {
                             </MDBNavItem>
                         </MDBNavbarNav>
                         <MDBNavbarNav right>
-                        <MDBNavItem>
-                            <a className="nav-link waves-effect waves-light" href="/cart">
-                                <MDBIcon icon="shopping-cart" />
-                                <MDBBadge color="" className="ml-2 white-text badge-info">{this.state.items}</MDBBadge>
-                            </a>
-                        </MDBNavItem>
+                            {
+                                this.getCookie("MRole") === "Administrator" ? (
+                                    <MDBNavItem>
+                                        <MDBDropdown>
+                                            <MDBDropdownToggle nav caret onClick={this.handleNotifClick.bind(this)}>
+                                                <MDBIcon icon="bell" />
+                                                <MDBBadge color="" className="ml-2 white-text badge-info">{this.state.itemNotifCount}</MDBBadge>
+                                            </MDBDropdownToggle>
+                                            <MDBDropdownMenu className="dropdown-default notif-content">
+                                                {
+                                                    this.state.itemNotif.map(item => (
+                                                        <MDBBox tag="div" className="d-block w-100 p-2" key={item.user_id}>
+                                                            <MDBBox tag="div" className={
+                                                                    item.new === 1 ? (
+                                                                        "new d-block w-100 border border-dark p-1"
+                                                                    ) : (
+                                                                        "d-block w-100 border border-dark p-1"
+                                                                    )
+                                                                }
+                                                            >
+                                                                <MDBBox tag="span" className="d-block"><strong>{item.name}</strong> Update the profile.</MDBBox>
+                                                                <MDBBox tag="span" className="d-block font-size-pt7rem">{item.updated_at}</MDBBox>
+                                                            </MDBBox>
+                                                        </MDBBox>
+                                                    ))
+                                                }
+                                            </MDBDropdownMenu>
+                                        </MDBDropdown>
+                                    </MDBNavItem>
+                                ) : null
+                            }
+                            <MDBNavItem>
+                                <a className="nav-link waves-effect waves-light" href="/cart">
+                                    <MDBIcon icon="shopping-cart" />
+                                    <MDBBadge color="" className="ml-2 white-text badge-info">{this.state.itemCart}</MDBBadge>
+                                </a>
+                            </MDBNavItem>
                             <MDBNavItem>
                                 <MDBDropdown>
                                     <MDBDropdownToggle nav caret>
@@ -134,7 +236,7 @@ class Header extends Component {
                                     </MDBDropdownToggle>
                                     <MDBDropdownMenu className="dropdown-default">
                                         <MDBDropdownItem href="/edit-profile" className="px-4">Edit Profile</MDBDropdownItem>
-                                        <MDBDropdownItem onClick={this.handleLogout.bind()}>Logout</MDBDropdownItem>
+                                        <MDBDropdownItem onClick={this.handleLogout.bind(this, this.state.in_userId)}>Logout</MDBDropdownItem>
                                     </MDBDropdownMenu>
                                 </MDBDropdown>
                             </MDBNavItem>

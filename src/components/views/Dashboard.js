@@ -321,7 +321,8 @@ class Dashboard extends React.Component {
             key: in_key,
             name: in_name,
             email: in_email,
-            pass: in_password
+            pass: in_password,
+            date: new Date().toUTCString()
         }
 
         $.ajax({

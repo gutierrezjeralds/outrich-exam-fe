@@ -44,6 +44,23 @@ class Login extends React.Component {
         document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
     }
 
+    // Get Cookie
+    getCookie(cname) {
+        var name = cname + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(';');
+        for(var i = 0; i <ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) === ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) === 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+
     handleChange(fid, event) {
         this.setState({
             [fid]: event.target.value
@@ -124,6 +141,11 @@ class Login extends React.Component {
                     this.setCookie("MEmail", result.response.email, 1)
                     this.setCookie("MTrack", result.response.id, 1)
                     this.setCookie("MRole", result.response.role, 1)
+                    
+                    // Add dummy date in cookie if empty // For notication
+                    if ( this.getCookie("MNotifDate") !== "" || this.getCookie("MNotifDate") !== undefined ) {
+                        this.setCookie("MNotifDate", Date.now(), 30)
+                    }
     
                     setTimeout(
                         function() {

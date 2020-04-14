@@ -1,5 +1,8 @@
 // Common class
 // Font size
+.font-size-pt7rem{
+    font-size: $size-pt7rem !important;
+}
 .font-size-1rem{
     font-size: $size-1rem !important;
 }
@@ -643,5 +646,13 @@ body, #root{
 
     @include mediaQueries (mixin-max-medium) {
         @include md-content;
+    }
+}
+
+// notification
+.notif-content{
+    width: 220px;
+    .new{
+        background: $warm-gray;
     }
 }
