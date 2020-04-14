@@ -125,9 +125,9 @@ class Header extends Component {
                     let counter = 0
                     result.response.map(item => (
                         item.new === 1 ? (
-                            this.setState( prevState => ({
-                                itemNotifCount: parseInt(counter+= 1) + parseInt(prevState.itemNotifCount)
-                            }))
+                            this.setState({
+                                itemNotifCount: parseInt(counter+= 1)
+                            })
                         ) : null
                     ))
                 }
